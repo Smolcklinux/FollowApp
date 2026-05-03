@@ -1,7 +1,7 @@
 buildscript {
     ext {
         buildToolsVersion = "34.0.0"
-        minSdkVersion = 24 
+        minSdkVersion = 24 // Necessário para a Nova Arquitetura do RN 0.85
         compileSdkVersion = 34
         targetSdkVersion = 34
         ndkVersion = "26.1.10909125"
@@ -12,16 +12,39 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        // Plugin do Android Gradle (AGP) estável para RN 0.85
         classpath("com.android.tools.build:gradle:8.2.1")
+        
+        // Plugin do React Native (Gerencia o Autolinking e Codegen)
         classpath("com.facebook.react:react-native-gradle-plugin")
+        
+        // Plugin do Kotlin
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        
+        // Plugin do Google Services (Necessário para o Firebase)
         classpath("com.google.gms:google-services:4.4.2")
     }
 }
 
+/**
+ * Configuração de repositórios para todos os subprojetos (app e bibliotecas)
+ */
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+/**
+ * Configurações extras para garantir que o build não falhe por versões de dependências
+ */
+subprojects {
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.android.support' && !details.requested.name.contains('multidex')) {
+                details.useVersion "28.0.0"
+            }
+        }
     }
 }

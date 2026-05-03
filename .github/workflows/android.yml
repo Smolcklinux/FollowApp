@@ -2,11 +2,12 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main ] # Dispara o build sempre que você der push na branch main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -15,16 +16,32 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm' # Agiliza a instalação de dependências
 
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17' # Versão recomendada para o Gradle 8.x e RN 0.85
+          distribution: 'zulu'
+          cache: 'gradle'
+
       - name: Build Android Release
         run: |
           cd android
+          # Dá permissão de execução ao script do Gradle
           chmod +x gradlew
+          
+          # Limpeza profunda para evitar erros de cache do CMake/Codegen
           ./gradlew clean
+          rm -rf .cxx
+          
+          # Gera os arquivos de ponte da Nova Arquitetura (Essencial para o RN 0.85)
           ./gradlew generateCodegenArtifactsFromSchema
+          
+          # Compila o APK pulando o lint para ser mais rápido
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
@@ -32,3 +49,4 @@ jobs:
         with:
           name: FollowApp-APK
           path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 7 # O APK fica disponível para download por 7 dias

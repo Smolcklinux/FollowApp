@@ -2,18 +2,20 @@ apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
 
+/**
+ * Configurações do React Native
+ */
+react {
+    /* Defina as pastas do projeto se necessário */
+}
+
 android {
-    namespace "com.follow.app"
+    namespace "com.follow.app" // CRÍTICO: Deve ser igual ao package no app.json
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    packagingOptions {
-        pickFirst '**/libhermes.so'
-        pickFirst '**/libc++_shared.so'
-    }
-
     defaultConfig {
-        applicationId "com.follow.app"
-        minSdkVersion 24
+        applicationId "com.follow.app" // CRÍTICO: Identificador único do seu app
+        minSdkVersion 24 // Necessário para a Nova Arquitetura
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
@@ -23,6 +25,12 @@ android {
                 arguments "-DUNIT_TEST=OFF"
             }
         }
+    }
+
+    // Resolve conflitos de ficheiros duplicados em builds nativos
+    packagingOptions {
+        pickFirst '**/libhermes.so'
+        pickFirst '**/libc++_shared.so'
     }
 
     signingConfigs {
@@ -35,24 +43,42 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             signingConfig signingConfigs.debug
+        }
+        release {
+            // Em produção, deve-se usar uma chave real (.jks), mas mantemos debug para testar o build
+            signingConfig signingConfigs.debug 
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+
+    // Configuração para compilação C++ (Nova Arquitetura)
+    externalNativeBuild {
+        cmake {
+            path "src/main/jni/CMakeLists.txt"
         }
     }
 }
 
 dependencies {
+    // Dependência principal do React Native
     implementation("com.facebook.react:react-android")
+
+    // Firebase (BoM garante versões compatíveis entre os módulos)
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
 
+    // Motor Hermes
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
     }
 }
+
+// Aplica as configurações nativas do React Native
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
