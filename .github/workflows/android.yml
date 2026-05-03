@@ -15,13 +15,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24 # Atualizado para evitar avisos de depreciação
+          node-version: 24
           cache: 'npm'
 
       - name: Install Dependencies
         run: |
           npm install --legacy-peer-deps
-          # Garante que o CLI necessário para o post-build esteja presente
           npm install @react-native-community/cli --save-dev
 
       - name: Setup Java JDK
@@ -34,16 +33,19 @@ jobs:
       - name: Build Android Release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          # Força o ambiente a usar Node 24 para as Actions
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: |
           cd android
           chmod +x gradlew
           
-          # Limpeza de segurança
-          ./gradlew clean
+          # Garante que a pasta de destino do autolinking exista
+          mkdir -p build/generated/autolinking
           
-          # Compilação do APK (Otimizada sem o npx config que travava o pós-build)
+          # RESOLUÇÃO DO ERRO: Gera o JSON manualmente para o Gradle 9.3 validar a tarefa
+          npx react-native config > build/generated/autolinking/autolinking.json
+          
+          # Limpeza e compilação final
+          ./gradlew clean
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
