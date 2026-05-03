@@ -1,9 +1,9 @@
-pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
-plugins { id("com.facebook.react.settings") }
+pluginManagement {
+    includeBuild("../node_modules/@react-native/gradle-plugin")
+}
 
-extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
-    // Força o caminho do Autolinking para evitar o erro de 'Empty output'
-    ex.autolinkLibrariesWithApp()
+plugins {
+    id("com.facebook.react.settings")
 }
 
 rootProject.name = "FollowApp"
