@@ -19,10 +19,10 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        # O flag --legacy-peer-deps é vital para evitar conflitos de versão do React 19
+        # O flag --legacy-peer-deps resolve conflitos do React 19
         run: |
           npm install --legacy-peer-deps
-          echo "Verificando se o script de Autolinking foi instalado..."
+          echo "Verificando se o script de Autolinking existe..."
           ls node_modules/@react-native-community/cli-platform-android/native_modules.gradle
 
       - name: Setup Java JDK
@@ -33,17 +33,20 @@ jobs:
           cache: 'gradle'
 
       - name: Build Android Release
+        # Definimos o PROJECT_ROOT para que o Gradle não use o /dev/null
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
         run: |
           cd android
           chmod +x gradlew
           
-          # Limpeza de builds anteriores
+          # Limpeza e compilação
           ./gradlew clean
           
-          # Gera os arquivos necessários para a Nova Arquitetura
+          # Passo crucial para a Nova Arquitetura do RN 0.85
           ./gradlew generateCodegenArtifactsFromSchema
           
-          # Compila o APK final
+          # Gera o APK pulando o lint para evitar erros bobos de análise de código
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
