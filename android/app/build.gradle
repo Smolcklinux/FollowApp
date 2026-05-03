@@ -6,7 +6,6 @@ android {
     namespace "com.follow.app"
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    // Proteção contra duplicidade de arquivos nativos
     packagingOptions {
         pickFirst '**/libhermes.so'
         pickFirst '**/libc++_shared.so'
@@ -14,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.follow.app"
-        minSdkVersion 24 // Aumentado para 24 para suportar a New Arch
+        minSdkVersion 24
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
@@ -46,8 +45,6 @@ android {
 
 dependencies {
     implementation("com.facebook.react:react-android")
-    
-    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")

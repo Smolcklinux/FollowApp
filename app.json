@@ -1,4 +1,7 @@
 {
   "name": "FollowApp",
-  "displayName": "FollowApp"
+  "displayName": "FollowApp",
+  "android": {
+    "package": "com.follow.app"
+  }
 }

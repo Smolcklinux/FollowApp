@@ -23,11 +23,8 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          # Limpa caches antigos
           ./gradlew clean
-          # GERA OS ARQUIVOS Props.h E EventEmitters.h QUE FALTAVAM
           ./gradlew generateCodegenArtifactsFromSchema
-          # Compila o APK final
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
