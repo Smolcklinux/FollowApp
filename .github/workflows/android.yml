@@ -23,12 +23,12 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          # Limpeza profunda de caches e autolinking viciado
+          # Limpa caches antigos
           ./gradlew clean
-          rm -rf .cxx
-          rm -rf app/build/generated/autolinking
-          # Build forçando a desativação da New Arch
-          ./gradlew assembleRelease -x lint -PnewArchEnabled=false
+          # GERA OS ARQUIVOS Props.h E EventEmitters.h QUE FALTAVAM
+          ./gradlew generateCodegenArtifactsFromSchema
+          # Compila o APK final
+          ./gradlew assembleRelease -x lint
           
       - name: Upload APK
         uses: actions/upload-artifact@v4

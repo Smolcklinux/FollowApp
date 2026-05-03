@@ -6,15 +6,24 @@ android {
     namespace "com.follow.app"
     compileSdkVersion rootProject.ext.compileSdkVersion
 
+    // Proteção contra duplicidade de arquivos nativos
+    packagingOptions {
+        pickFirst '**/libhermes.so'
+        pickFirst '**/libc++_shared.so'
+    }
+
     defaultConfig {
         applicationId "com.follow.app"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 24 // Aumentado para 24 para suportar a New Arch
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
-        // Evita conflitos com bibliotecas nativas antigas
-        missingDimensionStrategy 'react-native-camera', 'general'
+        externalNativeBuild {
+            cmake {
+                arguments "-DUNIT_TEST=OFF"
+            }
+        }
     }
 
     signingConfigs {
@@ -27,9 +36,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
         release {
             signingConfig signingConfigs.debug
             minifyEnabled false
@@ -41,7 +47,7 @@ android {
 dependencies {
     implementation("com.facebook.react:react-android")
     
-    // Firebase BoM
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
