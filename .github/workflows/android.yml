@@ -1,28 +1,49 @@
-# CONFIGURAÇÕES DE MEMÓRIA
-org.gradle.jvmargs=-Xmx4048m -XX:MaxMetaspaceSize=1024m
+name: Build Android APK
 
-# SUPORTE ANDROIDX
-android.useAndroidX=true
-android.enableJetifier=true
+on:
+  push:
+    branches: [ main ]
 
-# NOVA ARQUITETURA (OBRIGATÓRIO PARA RN 0.85)
-newArchEnabled=true
-hermesEnabled=true
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-# OTIMIZAÇÃO DE ARQUITETURAS (AGILIZA O BUILD)
-reactNative.Architectures=arm64-v8a,x86_64
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-# --- FIX PARA AUTOLINKING E EMPTY OUTPUT ---
-# Informa ao Gradle onde está a raiz do projeto (node_modules)
-PROJECT_ROOT=..
-# Garante que o Gradle use o comando 'node' do sistema
-reactNative.nodeExecutableAndArgs=node
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
 
-# SILENCIAR AVISOS DO FIREBASE
-RNFB_SUPPRESS_NEW_ARCHITECTURE_WARNING=true
+      - name: Install Dependencies
+        run: |
+          npm install --legacy-peer-deps
+          npm install @react-native-community/cli-platform-android --save-dev
 
-# CONFIGURAÇÕES DE VELOCIDADE
-android.nonTransitiveRClass=true
-android.defaults.buildfeatures.buildconfig=true
-org.gradle.parallel=false
-org.gradle.configureondemand=true
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: 'gradle'
+
+      - name: Build Android Release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+        run: |
+          cd android
+          chmod +x gradlew
+          mkdir -p build/generated/autolinking
+          ./gradlew clean
+          npx react-native config
+          ./gradlew assembleRelease -x lint
+          
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FollowApp-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 7
