@@ -15,13 +15,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24 # Atualizado para evitar avisos de depreciação
           cache: 'npm'
 
       - name: Install Dependencies
         run: |
           npm install --legacy-peer-deps
-          npm install @react-native-community/cli-platform-android --save-dev
+          # Garante que o CLI necessário para o post-build esteja presente
+          npm install @react-native-community/cli --save-dev
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -33,12 +34,16 @@ jobs:
       - name: Build Android Release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          # Força o ambiente a usar Node 24 para as Actions
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: |
           cd android
           chmod +x gradlew
-          mkdir -p build/generated/autolinking
+          
+          # Limpeza de segurança
           ./gradlew clean
-          npx react-native config
+          
+          # Compilação do APK (Otimizada sem o npx config que travava o pós-build)
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
