@@ -1,58 +1,40 @@
-apply plugin: "com.android.application"
-apply plugin: "com.facebook.react"
-apply plugin: "com.google.gms.google-services"
-
-android {
-    namespace "com.follow.app"
-    compileSdkVersion rootProject.ext.compileSdkVersion
-
-    packagingOptions {
-        pickFirst '**/libhermes.so'
-        pickFirst '**/libc++_shared.so'
-    }
-
-    defaultConfig {
-        applicationId "com.follow.app"
-        minSdkVersion 24
-        targetSdkVersion 34
-        versionCode 1
-        versionName "1.0"
-
-        externalNativeBuild {
-            cmake {
-                arguments "-DUNIT_TEST=OFF"
-            }
-        }
-    }
-
-    signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
-    }
-
-    buildTypes {
-        release {
-            signingConfig signingConfigs.debug
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-        }
-    }
-}
-
-dependencies {
-    implementation("com.facebook.react:react-android")
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore")
-
-    if (hermesEnabled.toBoolean()) {
-        implementation("com.facebook.react:hermes-android")
-    } else {
-        implementation jscFlavor
-    }
+{
+  "name": "FollowApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "start": "react-native start",
+    "test": "jest",
+    "clean": "cd android && ./gradlew clean && cd .. && rm -rf node_modules && npm install"
+  },
+  "dependencies": {
+    "@react-native-firebase/app": "^24.0.0",
+    "@react-native-firebase/auth": "^24.0.0",
+    "@react-native-firebase/firestore": "^24.0.0",
+    "@react-navigation/native": "^7.0.0",
+    "@react-navigation/stack": "^7.0.0",
+    "axios": "^1.7.9",
+    "react": "19.0.0",
+    "react-native": "0.85.2",
+    "react-native-image-picker": "^7.1.2",
+    "react-native-safe-area-context": "^5.0.0",
+    "react-native-screens": "^4.0.0",
+    "react-native-vector-icons": "^10.2.0"
+  },
+  "devDependencies": {
+    "@react-native/babel-preset": "0.85.2",
+    "@react-native/metro-config": "0.85.2",
+    "@react-native/typescript-config": "0.85.2",
+    "typescript": "^5.0.0"
+  },
+  "overrides": {
+    "react": "19.0.0"
+  },
+  "android": {
+    "packageName": "com.follow.app"
+  },
+  "engines": {
+    "node": ">= 22.11.0"
+  }
 }
