@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ] # O build dispara sempre que você envia algo para a branch main
+    branches: [ main ]
 
 jobs:
   build:
@@ -19,29 +19,31 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        # Este passo é CRÍTICO: ele cria a pasta node_modules necessária para o Autolinking
-        run: npm install --legacy-peer-deps
+        # O flag --legacy-peer-deps é vital para evitar conflitos de versão do React 19
+        run: |
+          npm install --legacy-peer-deps
+          echo "Verificando se o script de Autolinking foi instalado..."
+          ls node_modules/@react-native-community/cli-platform-android/native_modules.gradle
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17' # Versão necessária para React Native 0.85 + Gradle 8
+          java-version: '17'
           distribution: 'zulu'
           cache: 'gradle'
 
       - name: Build Android Release
         run: |
           cd android
-          # Dá permissão de execução ao Gradle
           chmod +x gradlew
           
-          # Limpa builds anteriores e arquivos temporários
+          # Limpeza de builds anteriores
           ./gradlew clean
           
-          # Comando para preparar a Nova Arquitetura (New Arch)
+          # Gera os arquivos necessários para a Nova Arquitetura
           ./gradlew generateCodegenArtifactsFromSchema
           
-          # Gera o APK de produção (Release) pulando testes de lint para ser mais rápido
+          # Compila o APK final
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
@@ -49,4 +51,4 @@ jobs:
         with:
           name: FollowApp-APK
           path: android/app/build/outputs/apk/release/app-release.apk
-          retention-days: 7 # O link para download do APK ficará ativo por 7 dias
+          retention-days: 7
