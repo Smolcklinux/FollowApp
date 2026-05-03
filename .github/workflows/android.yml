@@ -20,10 +20,10 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          # Instalando dependências de forma limpa
           npm install --legacy-peer-deps
+          # Adicionando o CLI necessário sem forçar auditoria que quebra o build
           npm install @react-native-community/cli --save-dev
-          # Aplica correções de segurança recomendadas
-          npm audit fix --force
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -40,17 +40,16 @@ jobs:
           cd android
           chmod +x gradlew
           
-          # Cria a pasta e gera o JSON de autolinking necessário para o Gradle 9+
+          # Garante a pasta e o JSON de autolinking para o Gradle 9+
           mkdir -p build/generated/autolinking
           npx react-native config > build/generated/autolinking/autolinking.json
           
-          # Limpeza de builds anteriores
           ./gradlew clean
           
-          # GERAÇÃO DE CÓDIGO (Codegen): Resolve o erro de 'Props.h file not found'
+          # Gera os arquivos de cabeçalho C++ (Codegen) para evitar erro de Props.h
           ./gradlew generateCodegenArtifactsFromSchema
           
-          # Compilação final do APK
+          # Compilação final
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
