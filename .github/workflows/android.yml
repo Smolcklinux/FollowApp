@@ -20,9 +20,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          # Instalando dependências de forma limpa
           npm install --legacy-peer-deps
-          # Adicionando o CLI necessário sem forçar auditoria que quebra o build
           npm install @react-native-community/cli --save-dev
 
       - name: Setup Java JDK
@@ -40,16 +38,10 @@ jobs:
           cd android
           chmod +x gradlew
           
-          # Garante a pasta e o JSON de autolinking para o Gradle 9+
-          mkdir -p build/generated/autolinking
-          npx react-native config > build/generated/autolinking/autolinking.json
-          
+          # Limpeza de builds residuais
           ./gradlew clean
           
-          # Gera os arquivos de cabeçalho C++ (Codegen) para evitar erro de Props.h
-          ./gradlew generateCodegenArtifactsFromSchema
-          
-          # Compilação final
+          # Build do APK usando a arquitetura estável (Old Architecture/Bridge)
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
