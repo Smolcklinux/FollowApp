@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "775650546514",
+    "project_id": "follow-bc8f1",
+    "storage_bucket": "follow-bc8f1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:775650546514:android:0a5ab8ce15dd159ad7e08b",
+        "android_client_info": {
+          "package_name": "Com.fallow.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYFO3LxFR4LvwLB0gBgJlT6tU8nSXh_Rs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:775650546514:android:01830f91e5481449d7e08b",
+        "android_client_info": {
+          "package_name": "com.follow.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYFO3LxFR4LvwLB0gBgJlT6tU8nSXh_Rs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
