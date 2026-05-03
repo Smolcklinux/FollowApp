@@ -1,9 +1,10 @@
 buildscript {
     ext {
         buildToolsVersion = "34.0.0"
-        minSdkVersion = 24 // Necessário para a Nova Arquitetura do RN 0.85
+        minSdkVersion = 24
         compileSdkVersion = 34
         targetSdkVersion = 34
+        // NDK e Kotlin recomendados para RN 0.85 e New Arch
         ndkVersion = "26.1.10909125"
         kotlinVersion = "1.9.22"
     }
@@ -12,39 +13,35 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // Plugin do Android Gradle (AGP) estável para RN 0.85
+        // Plugin do Android Gradle estável
         classpath("com.android.tools.build:gradle:8.2.1")
         
-        // Plugin do React Native (Gerencia o Autolinking e Codegen)
+        // Plugin do React Native (Essencial para o Codegen/New Arch)
         classpath("com.facebook.react:react-native-gradle-plugin")
         
         // Plugin do Kotlin
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         
-        // Plugin do Google Services (Necessário para o Firebase)
+        // Plugin do Google Services para o Firebase (Versão 4.4.2 está ótima)
         classpath("com.google.gms:google-services:4.4.2")
     }
 }
 
 /**
- * Configuração de repositórios para todos os subprojetos (app e bibliotecas)
+ * Configuração de repositórios para todos os módulos
  */
 allprojects {
     repositories {
         google()
         mavenCentral()
-    }
-}
-
-/**
- * Configurações extras para garantir que o build não falhe por versões de dependências
- */
-subprojects {
-    project.configurations.all {
-        resolutionStrategy.eachDependency { details ->
-            if (details.requested.group == 'com.android.support' && !details.requested.name.contains('multidex')) {
-                details.useVersion "28.0.0"
-            }
+        // Adicionamos o maven local para o caso de bibliotecas autolinkadas
+        maven {
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            url("$rootDir/../node_modules/jsc-android/dist")
         }
     }
 }
+
+// Removi o bloco de "resolutionStrategy" antigo para evitar conflitos com AndroidX
