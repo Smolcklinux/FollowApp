@@ -1,17 +1,14 @@
 apply plugin: "com.android.application"
+apply plugin: "com.facebook.react" // O plugin do React deve vir logo após o do Android
 apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
 
-// IMPORTANTE: Definir as variáveis explicitamente aqui caso o rootProject falhe
 def mCompileSdk = 34
 def mTargetSdk = 34
 def mMinSdk = 24
 
 android {
-    // RESOLVE O ERRO: "does not specify compileSdk"
     compileSdk mCompileSdk
-    
     namespace "com.follow.app"
 
     defaultConfig {
@@ -20,15 +17,6 @@ android {
         targetSdk mTargetSdk
         versionCode 1
         versionName "1.0"
-        
-        multiDexEnabled true
-    }
-
-    // Configurações do React Native dentro do bloco android para algumas versões
-    packagingOptions {
-        jniLibs {
-            useLegacyPackaging = false
-        }
     }
 
     buildTypes {
@@ -40,12 +28,15 @@ android {
 }
 
 /**
- * Configurações do React Native (Fora do bloco android)
+ * CONFIGURAÇÃO DO REACT NATIVE
+ * No RN 0.85, se o cliPath der erro, tente usar a forma simplificada
  */
 react {
-    autolinkLibrariesWithApp()
+    // Se o erro do /dev/null persistir, mantenha estas linhas. 
+    // Caso contrário, o plugin costuma encontrar sozinho se o PROJECT_ROOT estiver no gradle.properties
     cliPath = "../node_modules/react-native/cli.js"
     root = file("../../")
+    
     hermesEnabled = true
 }
 
