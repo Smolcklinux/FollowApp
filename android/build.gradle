@@ -1,10 +1,12 @@
 buildscript {
     ext {
+        // Versões recomendadas para estabilidade no RN 0.85
         buildToolsVersion = "34.0.0"
         minSdkVersion = 24
         compileSdkVersion = 34
         targetSdkVersion = 34
-        // NDK e Kotlin recomendados para RN 0.85 e New Arch
+        
+        // NDK e Kotlin alinhados para evitar erros de compilação C++ (New Arch)
         ndkVersion = "26.1.10909125"
         kotlinVersion = "1.9.22"
     }
@@ -13,28 +15,29 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // Plugin do Android Gradle estável
+        // Plugin do Android Gradle compatível com a versão 8.7 do Gradle
         classpath("com.android.tools.build:gradle:8.2.1")
         
-        // Plugin do React Native (Essencial para o Codegen/New Arch)
+        // Plugin do React Native (Essencial para Autolinking e Codegen)
         classpath("com.facebook.react:react-native-gradle-plugin")
         
-        // Plugin do Kotlin
+        // Plugin do Kotlin necessário para módulos nativos modernos
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         
-        // Plugin do Google Services para o Firebase (Versão 4.4.2 está ótima)
+        // Plugin do Google Services para o Firebase (Sincronizado com o seu google-services.json)
         classpath("com.google.gms:google-services:4.4.2")
     }
 }
 
 /**
- * Configuração de repositórios para todos os módulos
+ * Configuração de repositórios para todos os módulos (app e bibliotecas externas)
  */
 allprojects {
     repositories {
         google()
         mavenCentral()
-        // Adicionamos o maven local para o caso de bibliotecas autolinkadas
+
+        // Garante que o Gradle encontre os binários do React Native e do motor JSC/Hermes
         maven {
             url("$rootDir/../node_modules/react-native/android")
         }
@@ -44,4 +47,7 @@ allprojects {
     }
 }
 
-// Removi o bloco de "resolutionStrategy" antigo para evitar conflitos com AndroidX
+/**
+ * Removemos blocos antigos de 'resolutionStrategy' para garantir total 
+ * compatibilidade com AndroidX e Firebase moderno.
+ */
