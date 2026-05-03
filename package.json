@@ -23,6 +23,7 @@
     "react-native-vector-icons": "^10.2.0"
   },
   "devDependencies": {
+    "@react-native-community/cli-platform-android": "15.0.1",
     "@react-native/babel-preset": "0.85.2",
     "@react-native/metro-config": "0.85.2",
     "@react-native/typescript-config": "0.85.2",
