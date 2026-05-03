@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ] # Dispara o build sempre que você der push na branch main
+    branches: [ main ] # O build dispara sempre que você envia algo para a branch main
 
 jobs:
   build:
@@ -16,32 +16,32 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm' # Agiliza a instalação de dependências
+          cache: 'npm'
 
       - name: Install Dependencies
+        # Este passo é CRÍTICO: ele cria a pasta node_modules necessária para o Autolinking
         run: npm install --legacy-peer-deps
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17' # Versão recomendada para o Gradle 8.x e RN 0.85
+          java-version: '17' # Versão necessária para React Native 0.85 + Gradle 8
           distribution: 'zulu'
           cache: 'gradle'
 
       - name: Build Android Release
         run: |
           cd android
-          # Dá permissão de execução ao script do Gradle
+          # Dá permissão de execução ao Gradle
           chmod +x gradlew
           
-          # Limpeza profunda para evitar erros de cache do CMake/Codegen
+          # Limpa builds anteriores e arquivos temporários
           ./gradlew clean
-          rm -rf .cxx
           
-          # Gera os arquivos de ponte da Nova Arquitetura (Essencial para o RN 0.85)
+          # Comando para preparar a Nova Arquitetura (New Arch)
           ./gradlew generateCodegenArtifactsFromSchema
           
-          # Compila o APK pulando o lint para ser mais rápido
+          # Gera o APK de produção (Release) pulando testes de lint para ser mais rápido
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
@@ -49,4 +49,4 @@ jobs:
         with:
           name: FollowApp-APK
           path: android/app/build/outputs/apk/release/app-release.apk
-          retention-days: 7 # O APK fica disponível para download por 7 dias
+          retention-days: 7 # O link para download do APK ficará ativo por 7 dias
