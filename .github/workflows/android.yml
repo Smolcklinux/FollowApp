@@ -14,7 +14,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22 # Atualizado para a versão que seu projeto exige
+          node-version: 22
 
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
@@ -23,6 +23,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
+          ./gradlew clean
           ./gradlew assembleRelease
 
       - name: Upload APK
