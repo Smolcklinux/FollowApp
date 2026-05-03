@@ -12,6 +12,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        // Evita conflitos com bibliotecas nativas antigas
+        missingDimensionStrategy 'react-native-camera', 'general'
     }
 
     signingConfigs {
@@ -38,7 +41,7 @@ android {
 dependencies {
     implementation("com.facebook.react:react-android")
     
-    // Firebase
+    // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
