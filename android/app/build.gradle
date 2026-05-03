@@ -1,103 +1,62 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
-apply plugin: "com.google.gms.google-services" // Plugin do Firebase
+apply plugin: "com.google.gms.google-services"
 
-/**
- * Configurações do React Native
- */
-react {
-    /* Folha de especificações para o Autolinking */
-    autolinkLibrariesWithApp()
-
-    /* Configurações para evitar o erro de 'Empty output' no /dev/null */
-    cliPath = "../node_modules/react-native/cli.js"
-    root = file("../../")
-
-    /* Motor JS e Nova Arquitetura */
-    hermesEnabled = true
-}
-
-/**
- * Define se o Proguard deve ser usado para reduzir o tamanho do APK
- */
-def enableProguardInReleaseBuilds = false
-
-/**
- * Define a arquitetura padrão para o build
- */
-def jscFlavor = 'org.webkit:android-jsc:+'
+// IMPORTANTE: Definir as variáveis explicitamente aqui caso o rootProject falhe
+def mCompileSdk = 34
+def mTargetSdk = 34
+def mMinSdk = 24
 
 android {
-    ndkVersion rootProject.ext.ndkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-    compileSdk rootProject.ext.compileSdkVersion
-
+    // RESOLVE O ERRO: "does not specify compileSdk"
+    compileSdk mCompileSdk
+    
     namespace "com.follow.app"
+
     defaultConfig {
         applicationId "com.follow.app"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdk mMinSdk
+        targetSdk mTargetSdk
         versionCode 1
         versionName "1.0"
-
-        // Necessário para o Firebase e Nova Arquitetura
+        
         multiDexEnabled true
     }
 
-    signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
-        release {
-            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-                storeFile file(MYAPP_UPLOAD_STORE_FILE)
-                storePassword MYAPP_UPLOAD_STORE_PASSWORD
-                keyAlias MYAPP_UPLOAD_KEY_ALIAS
-                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
-            } else {
-                // Usa a chave de debug se a de release não estiver configurada (apenas para teste)
-                storeFile file('debug.keystore')
-                storePassword 'android'
-                keyAlias 'androiddebugkey'
-                keyPassword 'android'
-            }
-        }
-    }
-
-    buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-        }
-    }
-
+    // Configurações do React Native dentro do bloco android para algumas versões
     packagingOptions {
         jniLibs {
             useLegacyPackaging = false
         }
     }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+/**
+ * Configurações do React Native (Fora do bloco android)
+ */
+react {
+    autolinkLibrariesWithApp()
+    cliPath = "../node_modules/react-native/cli.js"
+    root = file("../../")
+    hermesEnabled = true
 }
 
 dependencies {
-    // Dependência principal do React Native
     implementation("com.facebook.react:react-android")
-
-    // Firebase (BoM garante versões compatíveis entre os módulos)
     implementation platform('com.google.firebase:firebase-bom:33.1.0')
     implementation 'com.google.firebase:firebase-analytics'
-
-    // Motor Hermes para performance
+    
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
-        implementation jscFlavor
+        implementation "org.webkit:android-jsc:+"
     }
 }
