@@ -1,9 +1,9 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
-apply plugin: "com.google.gms.google-services" // Necessário para o Firebase
+apply plugin: "com.google.gms.google-services" // Aplica o Firebase aqui
 
 android {
-    namespace "com.follow.app" // Nome único do seu app
+    namespace "com.follow.app" // Identidade do app no Android moderno
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
@@ -28,8 +28,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig signingConfigs.debug // Para teste, usamos a de debug
-            minifyEnabled enableProguardInReleaseBuilds
+            signingConfig signingConfigs.debug 
+            minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
@@ -37,9 +37,13 @@ android {
 
 dependencies {
     implementation("com.facebook.react:react-android")
+    
+    // Dependências do Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
-    
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
