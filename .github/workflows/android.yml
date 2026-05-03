@@ -22,9 +22,14 @@ jobs:
       - name: Build Android Release
         run: |
           cd android
+          # Dá permissão de execução ao Gradle
           chmod +x gradlew
+          # Limpa builds anteriores
           ./gradlew clean
-          ./gradlew assembleRelease -x lint
+          # Remove cache do CMake que causa o erro de diretório inexistente
+          rm -rf .cxx
+          # Executa o build forçando a arquitetura antiga
+          ./gradlew assembleRelease -x lint -PnewArchEnabled=false
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
