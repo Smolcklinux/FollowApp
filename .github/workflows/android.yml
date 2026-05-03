@@ -22,6 +22,8 @@ jobs:
         run: |
           npm install --legacy-peer-deps
           npm install @react-native-community/cli --save-dev
+          # Aplica correções de segurança recomendadas
+          npm audit fix --force
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -38,14 +40,17 @@ jobs:
           cd android
           chmod +x gradlew
           
-          # Garante que a pasta de destino do autolinking exista
+          # Cria a pasta e gera o JSON de autolinking necessário para o Gradle 9+
           mkdir -p build/generated/autolinking
-          
-          # RESOLUÇÃO DO ERRO: Gera o JSON manualmente para o Gradle 9.3 validar a tarefa
           npx react-native config > build/generated/autolinking/autolinking.json
           
-          # Limpeza e compilação final
+          # Limpeza de builds anteriores
           ./gradlew clean
+          
+          # GERAÇÃO DE CÓDIGO (Codegen): Resolve o erro de 'Props.h file not found'
+          ./gradlew generateCodegenArtifactsFromSchema
+          
+          # Compilação final do APK
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
