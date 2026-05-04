@@ -20,8 +20,9 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          # Limpeza preventiva para garantir que o node_modules seja criado corretamente
+          rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
-          npm install @react-native-community/cli --save-dev
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -35,16 +36,13 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: |
-          # 1. Preparar pastas
-          mkdir -p android/build/generated/autolinking
-          
-          # 2. GERAR O CONFIG REAL (Resolve o erro do packageName)
-          # Usamos o CLI para extrair os dados do seu projeto e salvar no local que o Gradle exige
-          npx react-native config > android/build/generated/autolinking/autolinking.json
-          
-          # 3. Entrar na pasta android e buildar
           cd android
           chmod +x gradlew
+          
+          # Garante o diretório do autolinking
+          mkdir -p build/generated/autolinking
+          npx react-native config > build/generated/autolinking/autolinking.json
+          
           ./gradlew clean
           ./gradlew assembleRelease -x lint
           

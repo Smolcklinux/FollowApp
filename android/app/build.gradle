@@ -1,13 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 
-/**
- * Configuração do React Native
- */
-react {
-    /* Autolinking e arquitetura */
-}
-
 def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
@@ -17,11 +10,16 @@ android {
 
     namespace "com.follow.app"
     defaultConfig {
-        applicationId "com.follow.app" // O ID do seu app
+        applicationId "com.follow.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+    }
+
+    // RESOLVE O AVISO DO GRADLE 10
+    buildFeatures {
+        buildConfig = true
     }
 
     signingConfigs {
@@ -38,13 +36,12 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig signingConfigs.debug // Usando debug para teste, troque para a sua key depois
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 
-    // Garante compatibilidade com Java 17
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -61,4 +58,5 @@ dependencies {
     }
 }
 
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+// O AUTOLINKING NO RN 0.85 É AUTOMÁTICO PELO PLUGIN 'com.facebook.react'
+// A LINHA QUE CAUSAVA O ERRO "native_modules.gradle not found" FOI REMOVIDA DAQUI.
