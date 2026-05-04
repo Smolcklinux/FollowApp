@@ -35,14 +35,16 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: |
+          # 1. Preparar pastas
+          mkdir -p android/build/generated/autolinking
+          
+          # 2. GERAR O CONFIG REAL (Resolve o erro do packageName)
+          # Usamos o CLI para extrair os dados do seu projeto e salvar no local que o Gradle exige
+          npx react-native config > android/build/generated/autolinking/autolinking.json
+          
+          # 3. Entrar na pasta android e buildar
           cd android
           chmod +x gradlew
-          
-          # SOLUÇÃO DEFINITIVA: Cria o diretório e o arquivo vazio que o Gradle exige
-          mkdir -p build/generated/autolinking
-          echo "{}" > build/generated/autolinking/autolinking.json
-          
-          # Limpeza e Build
           ./gradlew clean
           ./gradlew assembleRelease -x lint
           
