@@ -38,10 +38,12 @@ jobs:
           cd android
           chmod +x gradlew
           
-          # Limpeza de builds residuais
-          ./gradlew clean
+          # SOLUÇÃO DEFINITIVA: Cria o diretório e o arquivo vazio que o Gradle exige
+          mkdir -p build/generated/autolinking
+          echo "{}" > build/generated/autolinking/autolinking.json
           
-          # Build do APK usando a arquitetura estável (Old Architecture/Bridge)
+          # Limpeza e Build
+          ./gradlew clean
           ./gradlew assembleRelease -x lint
           
       - name: Upload APK
