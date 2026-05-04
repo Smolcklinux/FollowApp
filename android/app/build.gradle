@@ -1,28 +1,27 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
-apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "com.google.gms.google-services"
 
 /**
- * Configurações de Versão do SDK
+ * Configuração do React Native
  */
-def mCompileSdk = 34
-def mTargetSdk = 34
-def mMinSdk = 24
+react {
+    /* Autolinking e arquitetura */
+}
+
+def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
-    compileSdk mCompileSdk
-    namespace "com.follow.app"
+    ndkVersion rootProject.ext.ndkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
 
+    namespace "com.follow.app"
     defaultConfig {
-        applicationId "com.follow.app"
-        minSdk mMinSdk
-        targetSdk mTargetSdk
+        applicationId "com.follow.app" // O ID do seu app
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        
-        // Suporte para o grande número de métodos do Firebase
-        multiDexEnabled true
     }
 
     signingConfigs {
@@ -32,19 +31,6 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-                storeFile file(MYAPP_UPLOAD_STORE_FILE)
-                storePassword MYAPP_UPLOAD_STORE_PASSWORD
-                keyAlias MYAPP_UPLOAD_KEY_ALIAS
-                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
-            } else {
-                storeFile file('debug.keystore')
-                storePassword 'android'
-                keyAlias 'androiddebugkey'
-                keyPassword 'android'
-            }
-        }
     }
 
     buildTypes {
@@ -52,43 +38,27 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Em builds de teste/release inicial, manter minify como false ajuda a evitar erros de Proguard
+            signingConfig signingConfigs.debug // Usando debug para teste, troque para a sua key depois
             minifyEnabled false
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 
-    packagingOptions {
-        jniLibs {
-            useLegacyPackaging = false
-        }
+    // Garante compatibilidade com Java 17
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-}
-
-/**
- * Bloco de configuração do React Native para 0.85+
- */
-react {
-    // No RN 0.85, o autolinking é resolvido via settings.gradle.
-    // Ativamos o Hermes para melhor performance e compatibilidade com a Nova Arquitetura.
-    hermesEnabled = true
 }
 
 dependencies {
-    // O motor central do React Native
     implementation("com.facebook.react:react-android")
 
-    // Firebase BoM para gerenciar versões automaticamente
-    implementation platform('com.google.firebase:firebase-bom:33.1.0')
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.firebase:firebase-firestore'
-
-    // Garante que o motor de JS correto seja usado
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
-        implementation "org.webkit:android-jsc:+"
+        implementation jscFlavor
     }
 }
+
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
